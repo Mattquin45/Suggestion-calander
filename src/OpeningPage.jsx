@@ -12,7 +12,8 @@ const OpeningPage = () => {
 
   return (
     <>
-      <div id="intro-page">
+      
+      <div id="intro-page" className="body">
         <header className="woop">
           <h1> Welcome to your very own calendar</h1>
         </header>
