@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { PDFViewer } from "@react-pdf/renderer";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import DownloadCalendar from './pdf/downloadcalender';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { auth, db } from "./Firebase/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { doSignOut } from "./Firebase/Auth";
+
 
 
 
 const ReOrganizer = () => {
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  
     const [weekData, setWeekData] = useState({
   Monday: { title: "", hour: null, minute: null, time: null, description: "" },
   Tuesday: { title: "", hour: null, minute: null, time: null, description: "" },
@@ -16,13 +25,50 @@ const ReOrganizer = () => {
   Saturday: { title: "", hour: null, minute: null, time: null, description: "" },
   Sunday: { title: "", hour: null, minute: null, time: null, description: "" },
     });
-      console.log("Current Monday state:", weekData.Monday);
+  const saveWeekDataToFireStore = async () => { 
+    setMsg("");
+    const user = auth.currentUser;
+    if (!user) { 
+      setMsg("You need to be logged in to save your calendar!")
+      return;
+      }
+      try { 
+        setSaving(true);
+        await setDoc(
+          doc(db, "users", user.uid),
+          { weekData },
+          { merge: true }
+        );
+        setMsg("Calendar saved successfully!");
+      } catch (err) {
+        console.error(err);
+        setMsg("Calendar could not be saved");
+      } finally {
+        setSaving(false);
+      }
+    
+  }
+   const handleSignout = async (e) => {
+          e.preventDefault();
+  
+          try {
+            await doSignOut();
+              navigate("/");
+          }catch (err) {
+              setError(" Could not sign out, try again later");
+              console.error(err)
+          }
+  
+      };
 
     
     return (
       <>
+        <button class="signout" onClick={handleSignout}><img class="signoutPic" src="https://previews.123rf.com/images/tmricons/tmricons1707/tmricons170700613/81207214-logout-sign-icon-sign-out-button.jpg" alt="google button"></img></button>
+
     <div className='text'>
           <h2> Explore the creation of your calendar</h2>
+
         <hr className='long-divider'></hr>
           <h3 className='text-pads'> Our tools and technology provide clients for an easy to use UI experience to create your own calendar</h3>
           <h3> With the tools below you can create your own calendar and have either option of downloading it or </h3>
@@ -314,8 +360,15 @@ const ReOrganizer = () => {
                       </PDFDownloadLink>
                     <p className='text'>or</p> 
             <button class="downloadEmailButtons">Get emailed your schedule + Reminders</button>
+                    <p className='text'>or</p> 
+            <button class="downloadEmailButtons" onClick={saveWeekDataToFireStore} disabled={saving}>{saving ? "Saving..." : "Save Your Calendar!"}</button>
+
             </div>
         </div>
+        {msg && <p className="error">{msg}</p>}
+        {error && <p className="error">{error}</p>} {/* show error if exists */}
+
+
             </>
   );
 };
