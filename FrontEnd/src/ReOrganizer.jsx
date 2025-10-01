@@ -65,7 +65,7 @@ const ReOrganizer = () => {
     const user = auth.currentUser;
     axios.post("http://localhost:4000/send-email", {
       email: user.email,
-      message: "Te amo mucho mi amor!! This is so much fun tbh HAHAHAH, your doing great btw :), OMG this can be like a daily email reminder babe... OMG WHAT IF I MAKE  A WEBSITE THAT GIVES YOU DAILY VERSES OR LIKE APPRECIATION SENTANCES WHATTTT "
+      weekData
   })
       .then(() => { 
          setMsg("Email Reminders have been set!");
