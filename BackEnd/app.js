@@ -14,8 +14,8 @@ function sendEmail({ email, weekData }) {
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "noreplycalendarreminder@gmail.com",
-                pass: "isfm woly ufog ryst"
+                user: "Your Email",
+                pass: "Your Email-pass"
             },
         });
         //scheduler cron
