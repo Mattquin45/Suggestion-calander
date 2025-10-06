@@ -30,7 +30,7 @@ function sendEmail({ email, weekData }) {
             const { title, description, hour, minute } = todaysSchedule;
 
             const mail_config = {
-                from: "noreplycalendarreminder@gmail.com",
+                from: "Your Email",
                 to: email,
                 subject: `Your daily calendar reminder for ${today}: ${title}`,
                 text: `Today at ${hour}:${minute} you have: 
