@@ -63,7 +63,7 @@ const ReOrganizer = () => {
    
   const sendMail = () => {
     const user = auth.currentUser;
-    axios.post("https://suggestion-calander-backend.onrender.com/send-email", {
+    axios.post("http://localhost:4000/send-email", {
       email: user.email,
       weekData
   })

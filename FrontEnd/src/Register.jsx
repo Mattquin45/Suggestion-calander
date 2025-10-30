@@ -15,20 +15,38 @@ const Register = () => {
 
 
     const handleRegister = async (e) => {
-        e.preventDefault();
+  e.preventDefault();
 
-        if (password !== ReType) {
-            setError("Passwords do not match, try again!");
-            return;
-        }try {
-             doCreateUserWithEmailAndPassword(email, password, fullName);
-            navigate("/sign-in");
-        }catch (err) {
-            setError("Account has already been made, try logging in with it!");
-            console.error(err)
-        }
+  if (password !== ReType) {
+    setError("Passwords do not match, try again!");
+    return;
+  }
 
-    };
+  try {
+    const response = await fetch("http://localhost:8080/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: fullName, 
+        email: email,
+        password: password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Registration failed");
+    }
+
+    const data = await response.json();
+    console.log(" Registered successfully:", data);
+    navigate("/sign-in");
+  } catch (err) {
+    console.error(err);
+    setError("Account may already exist or server error.");
+  }
+};
     return (
         <>
       <div id="intro-page" className="body">

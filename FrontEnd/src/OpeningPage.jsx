@@ -9,29 +9,51 @@ const OpeningPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
-  const [error, setError] = useState(""); // NEW state for error message
+  const [error, setError] = useState(""); 
 
 
   const {userLoggedIn} = useAuth()
   const navigate = useNavigate();
   
-  const onSubmit = async (e) => { 
-    e.preventDefault()
-    if (!isSigningIn) { 
-      setIsSigningIn(true)
-      setError("");
-      try {
-        await doSignInWithEmailAndPassword(email, password)
-        navigate('/sign-in');
-      }
-      catch (err) {
-        console.error("Login mistake", err)
-        setError("Invalid email or password. Please attempt again");
-      } finally { 
-        setIsSigningIn(false);
-      }
+  const onSubmit = async (e) => {
+  e.preventDefault();
+  setError(""); 
 
+  if (isSigningIn) return; 
+  setIsSigningIn(true);
+
+  try {
+    const response = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,  
+        password: password,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Login success:", data);
+
+      localStorage.setItem("token", data.token);
+
+      navigate("/sign-in"); 
+    } else if (response.status === 401) {
+      setError("Invalid email or password. Please try again.");
+    } else if (response.status === 404) {
+      setError("User not found. Please register first.");
+    } else {
+      setError("Something went wrong. Please try again later.");
     }
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Unable to reach the server. Is it running?");
+  } finally {
+    setIsSigningIn(false);
+  }
 
   }
   
